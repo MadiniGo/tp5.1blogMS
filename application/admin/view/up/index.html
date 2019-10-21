@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!--引入css-->
+    <link rel="stylesheet" type="text/css" href="/static/webuploader/webuploader.css">
+    <script type="text/javascript" src="/static/js/jquery.min.js"></script>
+    <title>文件上传</title>
+    <style>
+        .box{
+            position: relative;
+            width: 200px;
+
+        }
+        .box p{
+            position: absolute;
+            right: 10px;
+            top: -3px;
+            z-index: 100;
+        }
+        .box p:hover{
+            background: #0d8ddb;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<div class="box">
+<img src="/uploads/20191008/3f7ee21b3bd67804378af8227c8fd0c6.jpg" id="avatar" style="width: 200px;">
+<p id="del">删除</p>
+</div>
+    <div class="btns">
+        <div id="picker">选择文件</div>
+</div>
+<!--引入JS-->
+<script type="text/javascript" src="/static/webuploader/webuploader.js" ></script>
+
+<script>
+    var uploader = WebUploader.create({
+        //选完后是否自动上传
+        auto:true,
+        // swf文件路径
+        swf:  '/static/webuploader/js/Uploader.swf',
+        // 文件接收服务端。
+        server: '{:url("admin/up/upload")}',
+        // 选择文件的按钮。可选。
+        // 内部根据当前运行是创建，可能是input元素，也可能是flash.
+        pick: '#picker',
+        // 不压缩image, 默认如果是jpeg，文件上传前会压缩一把再上传！
+        resize: false,
+        //设置文件上传域的name。
+        fileVal :'pic',
+        //传递请求额外参数
+        formData:{
+            '__token__':'{:token()}'
+        }
+    });
+    uploader.on( 'uploadSuccess', function( file,resopnse ) {
+        if (resopnse.status == 1){
+        $('#avatar').attr('src',resopnse.msg).show('slow')
+        }
+    });
+    $('#del').click(function(){
+        let img = $(this).prev().attr('src');
+        console.log(img);
+        $.ajax({
+            url:'{:url("admin/up/del")}',
+            type:'delete',
+            data:{img:img},
+            success:ret=>{
+                if(ret.status){
+                    alert(ret.msg);
+                    $('#avatar').css('display','none');
+                }else {
+                    alert(ret.msg);
+                }
+            }
+        });
+    });
+</script>
+</body>
+</html>

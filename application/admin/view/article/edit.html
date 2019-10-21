@@ -1,0 +1,114 @@
+{extend name="public/base" /}
+{block name="css"}
+<link rel="stylesheet" href="/static/editor-md/css/editormd.min.css" />
+{/block}
+{block name="content"}
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>简单示例</h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="form_basic.html#">
+                            <i class="fa fa-wrench"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-user">
+                            <li><a href="form_basic.html#">选项1</a>
+                            </li>
+                            <li><a href="form_basic.html#">选项2</a>
+                            </li>
+                        </ul>
+                        <a class="close-link">
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <form class="form-horizontal m-t" id="commentForm" method="post" action="{:url('/admin/article/update_1')}" enctype="multipart/form-data">
+                        <!--<input type="hidden" name="_method" value="PUT" >-->
+
+                        {:token()}
+                    <input type="hidden" name="id" value="{$data.id}">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">栏目</label>
+                            <div class="col-sm-8">
+                                <select class="form-control m-b" id="" name="cates_id">
+                                    {foreach $cates as $key => $cate}
+                                    <option value="{$cate.id}"  {if $cate.id==$data.cates_id }selected{/if} >{$cate.cate_name}</option>
+                                    {/foreach}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">标题：</label>
+                            <div class="col-sm-8">
+                                <input id="cname" name="title" minlength="2" type="text" class="form-control" required="" aria-required="true"
+                                value="{$data.title}"
+                                >
+                            </div>
+                        </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">文章图标：</label>
+                        <div class="col-sm-4">
+                            <div class="input-group">
+                                <input id='location' class="form-control" onclick="$('#i-file').click();">
+                                <label class="input-group-btn">
+                                    <input type="button" id="i-check" value="浏览文件" class="btn btn-primary" onclick="$('#i-file').click();">
+                                </label>
+                            </div>
+                        </div>
+                        <input type="file" name="image" id='i-file'  accept="jpg,jpeg,png,gif" onchange="$('#location').val($('#i-file').val());" style="display: none">
+                        <div class="col-sm-3"><img src="{$data.thumb}" alt="" style="width: 40px"></div>
+                    </div>
+                    
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">描述：</label>
+                            <div class="col-sm-8">
+                                <input id="cemail" type="text" class="form-control" name="desn" required="" aria-required="true"
+                                value="{$data.desn}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">内容：</label>
+                            <div class="col-sm-8">
+                                <div id="test-editormd">
+                                    <!-- Tips: Editor.md can auto append a `<textarea>` tag -->
+                                    <textarea style="display:none;" name="body" >{$data.body}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-4 col-sm-offset-3">
+                                <button class="btn btn-primary" type="submit">提交</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<script src="/static/js/jquery.min.js"></script>
+<script src="/static/editor-md/editormd.min.js"></script>
+<script type="text/javascript">
+    var testEditor = editormd("test-editormd", {
+        height:'500px',
+        path: "/static/editor-md/lib/",
+        imageUpload: true, //开启图片上传
+        imageUploadURL: '/admin/article/picUrl', //图片上传后台地址
+        onload: function() {
+            // 引入插件 执行监听方法
+            editormd.loadPlugin("/static/editor-md/plugins/image-handle-paste/image-handle-paste", function(){
+                testEditor.imagePaste();
+            });
+        }
+    });
+</script>
+{/block}

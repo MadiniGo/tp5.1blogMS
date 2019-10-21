@@ -1,0 +1,212 @@
+﻿{extend name="public/base" /}
+{block name="css"}
+<style type="text/css">
+    *{
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+    /** 重置列表元素 **/
+    ul, ol { list-style: none; }
+    /** 重置文本格式元素 **/
+    a,a:hover { text-decoration: none; }
+    /** 重置表单元素 **/
+    legend { color: #000; } /* for ie6 */
+    fieldset, img { border: 0; } /* img 搭车：让链接里的 img 无边框 */
+    button, input, select, textarea { font-size: 100%; } /* 使得表单元素在 ie 下能继承字体大小 */
+    /** 重置表格元素 **/
+    table { border-collapse: collapse; border-spacing: 0; }
+    .searchbox {
+        position: relative;
+        z-index: 1;
+        clear: both;
+        width: 630px;
+        height: 40px;
+        margin: 10px auto 20px;
+        border: 2px solid #148663;
+    }
+    .mod_select {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 98px;
+    }
+    .mod_select .select_box {
+        position: relative;
+        width: 98px;
+        height: 36px;
+    }
+    .mod_select .select_box .select_txt {
+        display: inline-block;
+        width: 98px;
+        height: 36px;
+        padding-left: 28px;
+        overflow: hidden;
+        line-height: 36px;
+        font-size: 16px;
+        cursor: pointer;
+    }
+    .mod_select .select_box .select-icon {
+        position: absolute;
+        top: 50%;
+        right: 10px;
+        transform: translate(0,-50%);
+        width: 10px;
+        height: 10px;
+        background: url(/static/admin/img/search_ico.png) center no-repeat;
+    }
+    .mod_select .select_box .option {
+        display: none;
+        position: absolute;
+        top: 40px;
+        left: -2px;
+        width: 120%;
+        background-color: #fff;
+        border: 2px solid #148663;
+        border-top: 0;
+    }
+    .mod_select .select_box .option li {
+        padding-left: 10px;
+        font-size: 16px;
+        line-height: 2;
+        cursor: pointer;
+    }
+    .searchbox .import {
+        width: 426px;
+        height: 36px;
+        margin-left: 100px;
+        padding-left: 20px;
+        border: none;
+        outline: none;
+    }
+    .searchbox .btn-search {
+        position: absolute;
+        right: 0;
+        width: 100px;
+        height: 36px;
+        color: #fff;
+        background-color: #148663;
+        border: 0;
+    }
+</style>
+{/block}
+{block name="content"}
+<div class="wrapper wrapper-content animated fadeInRight"  >
+    <div class="row" >
+            <div class="searchbox">
+                <div class="mod_select">
+                    <div class="select_box">
+                        <span class="select_txt">分类</span>
+                        <span class="select-icon"></span>
+                        <ul class="option">
+                            {foreach $cates as $cate}
+                                <li value="{$cate.id}">{$cate.cate_name}</li>
+                            {/foreach}
+                        </ul>
+                    </div>
+                </div>
+                <form action="" method="get" >
+                    <input type="hidden" name="id" value="" id="select_value">
+                    <input type="text" name="title" id="searchPlaceholder" class="import" placeholder="请输入文章标题">
+                    <button  class="btn-search" id="searchForm">搜   索</button>
+                </form>
+            </div>
+        </div>
+    <div class="row"  >
+        <div class="col-sm-12 text-right">
+            <a href="{:url('admin/article/create')}" class="btn btn-primary">添加文章</a>
+        </div>
+    </div>
+    <div class="row" id="app" >
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-content">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>图标</th>
+                            <th>栏目</th>
+                            <th>标题</th>
+                            <th>更新时间</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <template v-for="item of items.data ">
+                        <tr>
+                            <td>{{item.id}}</td>
+                            <td><img :src="item.thumb" alt="" width="60px"></td>
+                            <td>{{item.cates.cate_name}}</td>
+                            <td>{{item.title}}</td>
+                            <td>{{item.update_time}}</td>
+                            <td>
+                                <a @click="editart(item.id)">修改|</a>
+                                <a @click="delart(item.id)">删除</a>
+                            </td>
+                        </tr>
+                        </template>
+                        </tbody>
+                    </table>
+                    <template>
+
+                    </template>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row" >
+        <div class="col-sm-8 text-right">
+            {$articles|raw}
+        </div>
+    </div>
+</div>
+{/block}
+{block name="js"}
+<script src="/static/js/vue.js"></script>
+<script>
+    var app =new Vue({
+        el:'#app',
+        data:{
+            items:{:json_encode($articles->toArray())},
+
+        },
+        methods:{
+            delart(id)
+            {
+                $.ajax({
+                    url: '/admin/article/' + id,
+                    method: "DELETE",
+                    success: ret => {
+                        console.log(ret)
+                      this.items = ret;
+                    }
+                })
+            },
+            editart(id){
+                location.href="/admin/article/"+id+"/edit";
+            }
+        }
+    });
+    $(function(){
+        $(".select_box").click(function(event){
+            event.stopPropagation();
+            $(this).find(".option").toggle();
+            $(this).parent().siblings().find(".option").hide();
+        });
+        $(document).click(function(event){
+            var eo=$(event.target);
+            if($(".select_box").is(":visible") && eo.attr("class")!="option" && !eo.parent(".option").length)
+                $('.option').hide();
+        });
+        $(".option li").click(function(){
+            var check_value=$(this).attr('value');
+            var check_text = $(this).text();
+            $(this).parent().siblings(".select_txt").text(check_text);
+            $("#select_value").val(check_value);
+        });
+
+    })
+
+</script>
+{/block}

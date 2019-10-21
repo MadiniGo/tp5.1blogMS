@@ -1,0 +1,104 @@
+{extend name="public/base" /}
+{block name="css"}
+<link rel="stylesheet" type="text/css" href="/static/webuploader/webuploader.css">
+{/block}
+{block name="content"}
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>简单示例</h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="form_basic.html#">
+                            <i class="fa fa-wrench"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-user">
+                            <li><a href="form_basic.html#">选项1</a>
+                            </li>
+                            <li><a href="form_basic.html#">选项2</a>
+                            </li>
+                        </ul>
+                        <a class="close-link">
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <form class="form-horizontal m-t" id="commentForm" method="post" action="{:url('/admin/article')}" enctype="multipart/form-data">
+                        {:token()}
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">栏目：</label>
+                            <div class="col-sm-8">
+                                <select class="form-control m-b" id="" name="cates_id">
+                                    {foreach $cates as $key => $cate}
+                                    <option value="{$cate.id}">{$cate.cate_name}</option>
+                                    {/foreach}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">文章图标：</label>
+                                    <div class="col-sm-4">
+                                        <div class="input-group">
+                                            <input id='location' class="form-control" onclick="$('#i-file').click();">
+                                            <label class="input-group-btn">
+                                                <input type="button" id="i-check" value="浏览文件" class="btn btn-primary" onclick="$('#i-file').click();">
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <input type="file" name="image" id='i-file'  accept="jpg,jpeg,png,gif" onchange="$('#location').val($('#i-file').val());" style="display: none">
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">标题：</label>
+                            <div class="col-sm-8">
+                                <input id="cname" name="title" minlength="2" type="text" class="form-control" required="" aria-required="true">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">描述：</label>
+                            <div class="col-sm-8">
+                                <input id="cemail" type="text" class="form-control" name="desn" required="" aria-required="true">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">内容：</label>
+                            <div class="col-sm-8">
+                                <!-- 加载编辑器的容器 -->
+                                <script id="container" name="body" type="text/plain" >
+                                这里写你的初始化内容
+                                 </script>
+                                <!--<textarea id="ccomment" name="body" class="form-control" required="" aria-required="true"></textarea>-->
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-4 col-sm-offset-3">
+                                <button class="btn btn-primary" type="submit">提交</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{/block}
+{block name="js"}
+<!-- 配置文件 -->
+<script type="text/javascript" src="/static/ueditior/ueditor.config.js"></script>
+<!-- 编辑器源码文件 -->
+<script type="text/javascript" src="/static/ueditior/ueditor.all.js"></script>
+<!-- 实例化编辑器 -->
+<script type="text/javascript">
+    var ue = UE.getEditor('container',{
+        initialFrameWidth:800,
+        initialFrameHeight:500
+    });
+</script>
+
+{/block}

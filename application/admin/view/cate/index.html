@@ -1,0 +1,217 @@
+﻿{extend name="public/base" /}
+{block name="css"}
+<style type="text/css">
+    *{
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+    /** 重置列表元素 **/
+    ul, ol { list-style: none; }
+    /** 重置文本格式元素 **/
+    a,a:hover { text-decoration: none; }
+    /** 重置表单元素 **/
+    legend { color: #000; } /* for ie6 */
+    fieldset, img { border: 0; } /* img 搭车：让链接里的 img 无边框 */
+    button, input, select, textarea { font-size: 100%; } /* 使得表单元素在 ie 下能继承字体大小 */
+    /** 重置表格元素 **/
+    table { border-collapse: collapse; border-spacing: 0; }
+    .searchbox {
+        position: relative;
+        z-index: 1;
+        clear: both;
+        width: 630px;
+        height: 40px;
+        margin: 10px auto 20px;
+        border: 2px solid #148663;
+    }
+    .mod_select {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 98px;
+    }
+    .mod_select .select_box {
+        position: relative;
+        width: 98px;
+        height: 36px;
+    }
+    .mod_select .select_box .select_txt {
+        display: inline-block;
+        width: 98px;
+        height: 36px;
+        padding-left: 28px;
+        overflow: hidden;
+        line-height: 36px;
+        font-size: 16px;
+        cursor: pointer;
+    }
+    .mod_select .select_box .select-icon {
+        position: absolute;
+        top: 50%;
+        right: 10px;
+        transform: translate(0,-50%);
+        width: 10px;
+        height: 10px;
+        background: url(/static/admin/img/search_ico.png) center no-repeat;
+    }
+    .mod_select .select_box .option {
+        display: none;
+        position: absolute;
+        top: 40px;
+        left: -2px;
+        width: 100px;
+        background-color: #fff;
+        border: 2px solid #148663;
+        border-top: 0;
+    }
+    .mod_select .select_box .option li {
+        padding-left: 28px;
+        font-size: 16px;
+        line-height: 2;
+        cursor: pointer;
+    }
+    .searchbox .import {
+        width: 426px;
+        height: 36px;
+        margin-left: 100px;
+        padding-left: 20px;
+        border: none;
+        outline: none;
+    }
+    .searchbox .btn-search {
+        position: absolute;
+        right: 0;
+        width: 100px;
+        height: 36px;
+        color: #fff;
+        background-color: #148663;
+        border: 0;
+    }
+</style>
+{/block}
+{block name="content"}
+<div class="wrapper wrapper-content animated fadeInRight"  >
+    <div class="row" >
+        <div class="searchbox">
+            <div class="mod_select">
+                <div class="select_box">
+                    <span class="select_txt">服装</span>
+                    <span class="select-icon"></span>
+                    <ul class="option">
+                        <li>一级目录</li>
+                        <li>电器</li>
+                        <li>家用</li>
+                    </ul>
+                </div>
+            </div>
+            <form action="" >
+                <input type="hidden" name="" value="服装" id="select_value">
+                <input type="text" name="" id="searchPlaceholder" class="import" placeholder="请输入分类">
+                <input type="submit" value="搜   索" class="btn-search">
+            </form>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12 text-right">
+            <a href="{:url('admin/cate/create')}" class="btn btn-primary">添加分类</a>
+        </div>
+    </div>
+    <div class="row"  id="app">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-content">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>图标</th>
+                            <th>分类名</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <template v-for="item of items">
+                            <tr>
+                                <td>{{item.id}}</td>
+                                <td><img :src="item.icon_path" alt="" width="50px"></td>
+                                <td>{{str1.repeat(item.deep*3)}}  {{item.cate_name}}</td>
+                                <td>
+                                    <a @click="editart(item.id)">修改|</a>
+                                    <a @click="delart(item.id)">删除</a>
+                                </td>
+                            </tr>
+                        </template>
+                        </tbody>
+                    </table>
+                    <template>
+
+                    </template>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row" >
+        <div class="col-sm-8 text-right">
+
+        </div>
+    </div>
+</div>
+{/block}
+{block name="js"}
+<script src="/static/js/vue.js"></script>
+<script>
+    var app =new Vue({
+        el:'#app',
+        data:{
+            items:{:json_encode($data)},
+            str:'﹂',
+            str1:"—"
+    },
+    methods:{
+        delart(id)
+        {
+            if(confirm("是否删除分类")){
+                $.ajax({
+                    url: '/admin/cate/'+id,
+                    method: "DELETE",
+                    success: ret => {
+                        this.items = ret;
+
+                    }
+                })
+            }
+        },
+        editart(id){
+            location.href="/admin/cate/"+id+"/edit";
+        }
+    }
+    });
+    $(function(){
+        $(".select_box").click(function(event){
+            event.stopPropagation();
+            $(this).find(".option").toggle();
+            $(this).parent().siblings().find(".option").hide();
+        });
+        $(document).click(function(event){
+            var eo=$(event.target);
+            if($(".select_box").is(":visible") && eo.attr("class")!="option" && !eo.parent(".option").length)
+                $('.option').hide();
+        });
+        $(".option li").click(function(){
+            var check_value=$(this).text();
+            var zlValue = $('.option li:eq(1)').html();
+            var bqValue = $('.option li:eq(2)').html();
+            $(this).parent().siblings(".select_txt").text(check_value);
+            $("#select_value").val(check_value);
+            if(check_value == zlValue) {
+                $('#searchPlaceholder').prop('placeholder','请输入电器名称');
+            }else if(check_value == bqValue) {
+                $('#searchPlaceholder').prop('placeholder','请输入家用名称');
+            }else {
+                $('#searchPlaceholder').prop('placeholder','请输入服装名称');
+            }
+        });
+    })
+</script>
+{/block}
